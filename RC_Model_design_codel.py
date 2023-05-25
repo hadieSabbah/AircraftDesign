@@ -40,7 +40,7 @@ weight_total = mass*g
 fuslage_length = a*weight_total**c #Table 6.3
 thrust_weight = 0.75
 thrust = thrust_weight*weight_total
-print("The Thrust is %.3f, and the total weight is %.3f" %(thrust,weight_total))
+print("The Thrust is %.3f, and the total weight is %.3f\n" %(thrust,weight_total))
 ## Solving for s_wing 
 s_wing = symbols("s_wing")
 WCL = 5 # Based on mission design parameters(Long distance and not fast)
@@ -53,19 +53,28 @@ ib_kg_conversion = 2.2
 kg_ib_conversion = 1/ib_kg_conversion
 motor_watt = watt_ratio*mass*ib_kg_conversion
 ## Power System preliminary selection
-watt_ratio = 125 #units in watt per pound. This is based on the YouTube Video: "How to design your motor + esc_ battery Combination"
 ib_kg_conversion = 2.2
 kg_ib_conversion = 1/ib_kg_conversion
 power = watt_ratio*mass*ib_kg_conversion
-print("The power needed for you power motor is %.3f" %(power))
-#Dependent on the number of cells. Here the cell is at minimum of 3.7v per cell. The unit here is all in volts
+print("The power needed for you power motor is %.3f\n" %(power))
+#Dependent on the number of cells. Here the cell is at minimum of 3.7v per cell. The units here are all in volts. The variation can be graphed for a better optimization rate
 battery_2 = 7.4
 battery_3 = 11.1
 battery_4 = 14.8 
 battery_6 = 22.2 
-current_max = (power/battery_4) # Based on batterydecision, which can be designed based on data analytics and simulations. Determine weight of each battery and optimize accordingly.
-current_desirable = current_max/0.8 #Good rule of thumb to not go to the maximum esc due to heat and potential wearage of the esc itself
-print("You need a %.3f watt motor, a %.3f volt battery, and an ampere esc of %.3f" %(power,battery_4,current_desirable))
+battery_list = [battery_2,battery_3,battery_4,battery_6]
+current_max = []
+for battery in battery_list:
+    current_max.append(power/battery)
+current_desirable = np.divide(current_max,0.8) #Generally, you do not want the current to be going at max during flight. Heating might cause problems and will wear out the esc
+print(current_desirable)
+plt.plot(battery_list,current_desirable)
+plt.grid()
+plt.title("Battery Voltage with Current")
+plt.xlabel("Voltage")
+plt.ylabel("Current")
+plt.show()
+print("You need a %.3f watt motor, a %.3f volt battery, and an ampere esc of %.3f\n" %(power,battery_4,current_desirable))
 
 ## Determining Prop Sizing 
 #Input data from a variety of motors for the particular wattage and determine the most efficient motor for your design 
