@@ -20,7 +20,7 @@
 
 ## Weight estimation
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from PIL import Image
 from sympy import symbols, Eq, solve
 #mass_servo = []
@@ -36,8 +36,11 @@ mass = 1.7
 a = 0.71 # table 6.3
 c = 0.48 # table 6.3
 g = 9.81
+ib_kg_conversion = 2.2
+kg_ib_conversion = 1/ib_kg_conversion
+weight_pound = mass*kg_ib_conversion
 weight_total = mass*g
-fuslage_length = a*weight_total**c #Table 6.3
+fuslage_length = a*weight_pound**c #Table 6.3 from Conceptual Approach
 thrust_weight = 0.75
 thrust = thrust_weight*weight_total
 print("The Thrust is %.3f, and the total weight is %.3f\n" %(thrust,weight_total))
@@ -49,8 +52,6 @@ sol = solve(expr)
 s_wing = sol[0]
 wing_loading = weight_total/s_wing
 watt_ratio = 125 #units in watt per pound. This is based on the YouTube Video: "How to design your motor + esc_ battery Combination"
-ib_kg_conversion = 2.2
-kg_ib_conversion = 1/ib_kg_conversion
 motor_watt = watt_ratio*mass*ib_kg_conversion
 ## Power System preliminary selection
 ib_kg_conversion = 2.2
@@ -136,13 +137,13 @@ c_r_vtail = (2*s_vtail)/(b_vtail*(1+taper_vtail)) #Root chord of tail
 c_t_vtail = taper_vtail*c_r_vtail #Tip chord of tail
 c_bar_vtail = 2/3*(c_r_vtail)*((1+taper_vtail+taper_vtail**2)/(1+taper_vtail)) #M.A.C of the wing
 y_bar_vtail = (b_vtail/2)*(1/3)*((1+2*taper_vtail)/(1+taper_vtail)) #M.A.C location from the tip chord.
-#hi
 ## Calculation of aerodynamics forces 
 
-#### Create a solidworks model that automatically the inputs fond into this program. 
+#### Create a solidworks model that automatically inputs values found into this program. 
 #### Create a rough sketch of the model and determine the airfoil to determine K 
 #### Airfoil optimization programs are found in the book by Alexander on airfoil theory. 
 #### Look for manfacturing process and how that would apply with designs. 
+### The airfoil decided on is E423 Airfoil. The decision was made based upon previously made aircrafts. 
 rho = 1.255 #Expected altitude is 60 meters.Thus, assuming sea level. Units are also meteric
 n_p = 0.8 #the average power efficiency is 0.8. However, this must be researched even further for the particular motor used
 velocity_cruise = (power/thrust)*n_p #n_p is efficiency of engine, and power refers to the motor.
@@ -154,7 +155,7 @@ beta = np.sqrt(1-M**2)
 mid_chord_angle = [] #in radians
 cl_alpha_2D = [] #in radians 
 k = (beta*cl_alpha_2D)/(2*np.pi)
-a_w = (2*np.pi*AR_wing)/(2+np.sqrt((((AR_wing**2)*(beta**2)/(k**2))*(1+ ((np.tan(mid_chord_angle))/beta)+4))))
+a_w = (2*np.pi*AR_wing)/(2+np.sqrt((((AR_wing**2)*(beta**2)/(k**2))*(1+ ((np.tan(mid_chord_angle))/beta)+4)))) #Cl_alpha_wing. Formula found in Bernard's book for stability and control
 a_b = []
 a_wb = a_w + a_b
 a_t = []
