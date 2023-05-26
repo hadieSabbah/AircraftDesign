@@ -153,25 +153,61 @@ Re = (rho*velocity_cruise*c_bar)/(nu) #Reynolds Number
 speed_sound = 343 #meters/second
 #Calculating a_w 
 M = velocity_cruise/speed_sound #mach number 
+print("The mach is %.3f\n"%(M))
 beta = np.sqrt(1-M**2)
-mid_chord_angle = [] #in radians
+print("Beta is %.3f\n"%(beta))
+mid_chord_angle_list = []
+for mid_chord_angle in range(0,20,5):
+    mid_chord_angle_list.append(mid_chord_angle)
+print("Mid Chord line angles:\n",mid_chord_angle_list)
+mid_chord_angle_list = [number*(math.pi/180) for number in mid_chord_angle_list ] # in radians
 #cl_alpha were obtained through XFLR5 computation 
 alpha_1 = 4
-alpha_2 = 5
+alpha_2 = 8
 cl_1 =  1.52161 
-cl_2 =  1.52161 
+cl_2 =  1.87636 
 cl_alpha_2D =((cl_2-cl_1)/(alpha_2-alpha_1))*(180/np.pi) #in radians 
 k = (beta*cl_alpha_2D)/(2*np.pi)
-####a_w = (2*np.pi*AR_wing)/(2+ math.sqrt((((AR_wing**2)*(beta**2)/(k**2))*(1+ ((math.tan(mid_chord_angle))/beta)+4)))) #Cl_alpha_wing. Formula found in Bernard's book for stability and control
+a_w = []
+for mid_chord_angle in mid_chord_angle_list:
+    a_w.append((2*np.pi*AR_wing)/(2 + math.sqrt(((AR_wing**2 * beta**2)/(k**2)) *(1+ (math.tan(mid_chord_angle)**2)/(beta**2))+4))) #Cl_alpha_wing. Formula found in Bernard's book for stability and control
+    print(mid_chord_angle)
+print("Cl_alpha:\n",a_w)
 #Calculating Downwash per angle from Appendix B.5 Downwash from Brenard's book(Dynamics of Flight)
 k_a = 1/AR_wing - 1/(1+AR_wing**1.7)
 k_lambda = (10-(3*taper))/7
 h_h = 0.1 #in meters. This is the hieght difference between the mac and the tail mac... Optimization shall be conducted here for a low downwash angle per degree
 k_h = (1-abs(h_h/b_wing))/((((2*l_bar)/b_wing))**1/3)
-quarter_chord_ang = ... #in radians
-###epsilion_alpha = 4.4*(k_a*k_lambda*k_h*(math.cos(quarter_chord_ang))**(1/2))**1.19
+quarter_chord_ang_list = []
+for quarter_chord_ang in range(0,10,1):
+    quarter_chord_ang_list.append(quarter_chord_ang)
+print(quarter_chord_ang_list) 
+quarter_chord_ang_list = [number*(np.pi/180) for number in quarter_chord_ang_list]
+epsilion_alpha = []
+for quarter_chord_ang in quarter_chord_ang_list:
+    epsilion_alpha.append(4.4*(k_a*k_lambda*k_h*(math.cos(quarter_chord_ang))**(1/2))**1.19)
+print(epsilion_alpha)
+
+## Graphing values for data visualization and future optimization purposes
+#  EPSILION ALPHA GRAPH
+plt.plot(quarter_chord_ang_list,epsilion_alpha)
+plt.grid()
+plt.title("Quarter chord angle vs Epsilion_Alpha")
+plt.xlabel("Quarter Chord Angle(Radians)")
+plt.ylabel("Epsilion_alpha")
+plt.show()
+#   CL_ALPHA GRAPH
+plt.plot(mid_chord_angle_list,a_w)
+plt.grid()
+plt.title("Cl_alpha vs Mid chord angle")
+plt.xlabel("Mid Chord Angle")
+plt.ylabel("Cl_alpha")
+plt.show()
+
 #Calculating cl_alphas for different components of the aircraft
 fitness_ratio = 3 #This is the ratio of fuselage length per max diameter. This is based on Chapter 6 of Raymer's Textbook on Fuselage
 fuselage_diameter = fitness_ratio*fuselage_length
 body_diameter = fuselage_diameter/b_wing
-print(body_diameter)
+const_a_b =1.1#interpolate form fig B.1.2 a
+#a_b = const_a_b*a_w#Based on B.1.3 a from bernard's dynamics of flight book
+#a_wb = a_w+a_b
