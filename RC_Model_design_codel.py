@@ -20,9 +20,11 @@
 
 ## Weight estimation
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 from PIL import Image
 from sympy import symbols, Eq, solve
+import scipy 
 #mass_servo = []
 #mass_battery = []
 #mass_sec = []
@@ -75,7 +77,7 @@ plt.title("Battery Voltage with Current")
 plt.xlabel("Voltage")
 plt.ylabel("Current")
 plt.show()
-print("You need a %.3f watt motor, a %.3f volt battery, and an ampere esc of %.3f\n" %(power,battery_4,current_desirable))
+print("You need a %.3f watt motor, a %.3f volt battery, and an ampere esc of %.3f\n" %(power,battery_4,current_desirable[3]))
 
 ## Determining Prop Sizing 
 #Input data from a variety of motors for the particular wattage and determine the most efficient motor for your design 
@@ -104,7 +106,7 @@ print("You need a %.3f watt motor, a %.3f volt battery, and an ampere esc of %.3
 
 ## WING GEOMETRY CALCULATIONS 
 AR_wing = 9
-b_wing = np.sqrt(AR_wing*s_wing) #Span(both wings)
+b_wing = math.sqrt(AR_wing*s_wing) #Span(both wings)
 taper = 0.45 #Taper Ratio of wing.Number based on Raymer's book for optimal taper for subsonic flight
 c_r = (2*s_wing)/(b_wing*(1+taper)) #Root chord of wing. To be determined by CFD simulations
 c_t = taper*c_r #Tip chord wing. Equation from Raymer's book. Layout and configuration chapter 7
@@ -118,20 +120,18 @@ s_tail = (VH_bar*s_wing*c_bar)/l_bar
 Vv_bar = 0.04
 s_vtail = (Vv_bar*s_wing*b_wing)/l_bar
 AR_wetted = .8 ## Estimated from Fig 3.6 
-fig = Image.open("FlightStab/fig3.6.png") #figure 3.6 picture
-fig.show()
 Sref_Swet = AR_wetted/AR_wing
 L_D_design = 14 #Estimated from figure 3.6 as well for subsonic aircrafts
 ## TAIL CALCULATIONS(Horizontal tail and Vertical Tail)
 AR_tail = 2/3*(AR_wing)
-b_tail = np.sqrt(AR_tail*s_tail)#Span(both HT tails)
+b_tail = math.sqrt(AR_tail*s_tail)#Span(both HT tails)
 taper_tail = 0.45 #Taper ratio of tail
 c_r_tail = (2*s_tail)/(b_tail*(1+taper_tail)) #Root chord of tail
 c_t_tail = taper_tail*c_r_tail #Tip chord of tail
 c_bar_tail = 2/3*(c_r_tail)*((1+taper_tail+taper_tail**2)/(1+taper_tail)) #M.A.C of tail
 y_bar_tail = (b_tail/2)*(1/3)*((1+2*taper_tail)/(1+taper_tail)) #M.A.C location from the tip chord.
 AR_vtail = 1.5 #Table 4.3
-b_vtail = np.sqrt(AR_vtail*s_vtail)
+b_vtail = math.sqrt(AR_vtail*s_vtail)
 taper_vtail = 0.45 #Table 4.3
 c_r_vtail = (2*s_vtail)/(b_vtail*(1+taper_vtail)) #Root chord of tail
 c_t_vtail = taper_vtail*c_r_vtail #Tip chord of tail
@@ -147,15 +147,20 @@ y_bar_vtail = (b_vtail/2)*(1/3)*((1+2*taper_vtail)/(1+taper_vtail)) #M.A.C locat
 rho = 1.255 #Expected altitude is 60 meters.Thus, assuming sea level. Units are also meteric
 n_p = 0.8 #the average power efficiency is 0.8. However, this must be researched even further for the particular motor used
 velocity_cruise = (power/thrust)*n_p #n_p is efficiency of engine, and power refers to the motor.
+print("My Velocity Cruise is %.3f meteres per second"%(velocity_cruise))
 nu = 1.81e-5 #based on  Standard sea level measurements
 Re = (rho*velocity_cruise*c_bar)/(nu) #Reynolds Number
 speed_sound = 343 #meters/second
 M = velocity_cruise/speed_sound #mach number 
 beta = np.sqrt(1-M**2)
 mid_chord_angle = [] #in radians
-cl_alpha_2D = [] #in radians 
+alpha_1 = 4
+alpha_2 = 5
+cl_1 =  1.52161 
+cl_2 =  1.52161 
+cl_alpha_2D =((cl_2-cl_1)/(alpha_2-alpha_1))*(180/np.pi) #in radians 
 k = (beta*cl_alpha_2D)/(2*np.pi)
-a_w = (2*np.pi*AR_wing)/(2+np.sqrt((((AR_wing**2)*(beta**2)/(k**2))*(1+ ((np.tan(mid_chord_angle))/beta)+4)))) #Cl_alpha_wing. Formula found in Bernard's book for stability and control
+a_w = (2*np.pi*AR_wing)/(2+ math.sqrt((((AR_wing**2)*(beta**2)/(k**2))*(1+ ((math.tan(mid_chord_angle))/beta)+4)))) #Cl_alpha_wing. Formula found in Bernard's book for stability and control
 a_b = []
 a_wb = a_w + a_b
 a_t = []
