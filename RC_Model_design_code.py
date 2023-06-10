@@ -239,12 +239,10 @@ k_h = numerator_k_h/(denominator_k_h)**(1/3)
 quarter_chord_ang_list = []
 for quarter_chord_ang in range(0,10,1):
     quarter_chord_ang_list.append(quarter_chord_ang)
-print(quarter_chord_ang_list) 
 quarter_chord_ang_list = [number*(np.pi/180) for number in quarter_chord_ang_list]
 epsilion_alpha = []
 for quarter_chord_ang in quarter_chord_ang_list:
     epsilion_alpha.append(4.4*(k_a*k_lambda*k_h*(math.cos(quarter_chord_ang))**(1/2))**1.19)
-print(epsilion_alpha)
 
 ## Graphing values for data visualization and future optimization purposes
 #  EPSILION ALPHA GRAPH
@@ -278,8 +276,7 @@ plt.title("Cl_alpha of tail vs Mid chord angle")
 plt.xlabel("Mid Chord Angle")
 plt.ylabel("Cl_alpha Tail")
 plt.show()
-prop_diameter = ...
-#T_c = thrust/(rho*velocity_cruise**2*prop_diameter**2)
+T_c = thrust/(rho*velocity_cruise**2*prop_diameter**2)
 f = ... #Obtained from figure B.7,1 in Bernard's Dynamic of Flight and stability booklet 
 #cnp_alphap = f*c_sigma
 #cmp_alpha = ...
