@@ -24,7 +24,7 @@ import math
 import matplotlib.pyplot as plt
 from PIL import Image
 from sympy import symbols, Eq, solve
-import scipy 
+
 #mass_servo = []
 #mass_battery = []
 #mass_sec = []
@@ -34,14 +34,15 @@ import scipy
 #mass_control_horn_rods = []
 #mass_fuselage = []
 #mass_total =weight_servo+weight_battery+weight_sec+weight_motor+weight_prop+weight_receiver+weight_control_horn_rods+weight_fuselage
-mass = 1.4
-a = 3.7# table 6.3
-c = 0.23 # table 6.3
+mass = 0.8
+a = 0.23# table 6.3. The design is based on a general aviation aircraft. HOWEVER... NOT ACCURATE
+c = 0.5 # table 6.3. The design is based on a general aviation aircraft. HOWEVER... NOT ACCURATE.
 g = 9.81
 ib_kg_conversion = 2.2
 kg_ib_conversion = 1/ib_kg_conversion
 weight_pound = mass*kg_ib_conversion
 weight_total = mass*g
+weight_ounces = mass*35.274
 fuselage_length = a*weight_pound**c #Table 6.3 from Conceptual Approach
 thrust_weight = 0.75
 thrust = thrust_weight*weight_total
@@ -49,9 +50,9 @@ print("The Thrust is %.3f, and the total weight is %.3f\n" %(thrust,weight_total
 ## Solving for s_wing 
 s_wing = symbols("s_wing")
 WCL = 5 # Based on mission design parameters(Long distance and not fast)
-expr= (weight_total/((s_wing)**(3/2))) - WCL
+expr= (weight_ounces/((s_wing)**(3/2))) - WCL
 sol = solve(expr)
-s_wing = sol[0]
+s_wing = sol[0]*0.0923
 wing_loading = weight_total/s_wing
 watt_ratio = 125 #units in watt per pound. This is based on the YouTube Video: "How to design your motor + esc_ battery Combination"
 motor_watt = watt_ratio*mass*ib_kg_conversion
@@ -276,10 +277,13 @@ plt.title("Cl_alpha of tail vs Mid chord angle")
 plt.xlabel("Mid Chord Angle")
 plt.ylabel("Cl_alpha Tail")
 plt.show()
-T_c = thrust/(rho*velocity_cruise**2*prop_diameter**2)
+
+T_c = thrust/((rho*velocity_cruise**2)*prop_diameter**2)
 f = ... #Obtained from figure B.7,1 in Bernard's Dynamic of Flight and stability booklet 
 #cnp_alphap = f*c_sigma
 #cmp_alpha = ...
+print(T_c)
+
 ### STABILIY CALCULATIONS AND ESTIMATIONS 
 ##N.P. Calculations 
 #a = a_wb*(1+((a_t/a_wb)*(s_tail/s_wing)*(1-epsilion_alpha)))
